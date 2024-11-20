@@ -1,23 +1,37 @@
 #ifndef WIFISERVICE_H
 #define WIFISERVICE_H
 
-#include <WiFiMulti.h>
+#include <WiFi.h>
 #include "constants.h"
 
 class WiFiService {
 
-WiFiMulti wifiMulti;
-
 public:
     void begin() {
         // Set WiFi to station mode
-        wifiMulti.addAP(SECRET_SSID,SECRET_PASS);
+        WiFi.mode(WIFI_STA);
+        
+        // Connect to the Wi-Fi network
+        Serial.print("Connecting to WiFi...");
+        WiFi.begin(SECRET_SSID, SECRET_PASS);
 
-
+        // Wait for connection
+        while (WiFi.status() != WL_CONNECTED) {
+            Serial.print(".");
+            delay(500);
+        }
+        Serial.println("\nConnected to WiFi!");
     }
 
     bool isConnected() {
-        return wifiMulti.run() == WL_CONNECTED;
+        // Check if the device is connected to WiFi
+        return WiFi.status() == WL_CONNECTED;
+    }
+
+    void disconnect() {
+        // Disconnect from Wi-Fi
+        WiFi.disconnect();
+        Serial.println("Disconnected from WiFi.");
     }
 };
 

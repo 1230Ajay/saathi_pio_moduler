@@ -16,7 +16,7 @@ public:
     void connect(const char *host, int port)
     {
         Serial.println("Connecting to socket...");
-        socketIO.beginSSL(host, port, "/socket.io/?EIO=4");
+        socketIO.begin(host, port, "/socket.io/?EIO=4");
         socketIO.onEvent([this](socketIOmessageType_t type, uint8_t *payload, size_t length)
                          { this->socketIOEvent(type, payload, length); });
 

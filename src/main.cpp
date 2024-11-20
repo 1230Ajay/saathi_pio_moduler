@@ -67,6 +67,10 @@ void loop()
   bool socket_status = socketService.isConnected();
   internet_status = wiFiService.isConnected();
 
+  if(!internet_status){
+      wiFiService.begin();
+  }
+
   // Check if Wi-Fi is connected
   digitalWrite(INTERNET_LED, socket_status);
 
@@ -191,7 +195,8 @@ void loop()
       device_restart_time = 0; // Reset the restart time after restarting
     }
   }
-
+  
+  delay(2);
   // Update the SocketService loop to handle socket events
   socketService.loop();
 }
