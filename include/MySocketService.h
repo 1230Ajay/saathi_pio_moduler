@@ -5,38 +5,25 @@
 class SocketService
 {
 private:
-    SocketIOclient socketIO;
+  
     Helper helper;
 
 public:
+    SocketIOclient socketIO;
     // Constructor
-    SocketService() {}
+    SocketService() {
+      
+    }
 
     // Initialize the socket connection
     void connect(const char *host, int port)
     {
         Serial.println("Connecting to socket...");
-        socketIO.begin(host, port, "/socket.io/?EIO=4");
+        socketIO.beginSSL(host, port, "/socket.io/?EIO=4");
         socketIO.onEvent([this](socketIOmessageType_t type, uint8_t *payload, size_t length)
                          { this->socketIOEvent(type, payload, length); });
 
-        unsigned long startAttemptTime = millis();
 
-        while (!socketIO.isConnected() && millis() - startAttemptTime < 10000)
-        { // 10 seconds timeout
-            delay(1000*10);
-            Serial.print(".");
-        }
-
-        if (socketIO.isConnected())
-        {
-            sendDeviceConnectedEvent();
-            Serial.println("\nSocket connected");
-        }
-        else
-        {
-            Serial.println("\nFailed to connect to socket");
-        }
     }
 
     // Handle socket events
@@ -45,16 +32,34 @@ public:
         switch (type)
         {
         case sIOtype_DISCONNECT:
-
+            Serial.printf("[IOc] Disconnected!\n");
             break;
+        
+
         case sIOtype_CONNECT:
-            Serial.println("Socket connected");
+            Serial.printf("[IOc] Connected to url: %s\n", payload);
             socketIO.send(sIOtype_CONNECT, "/");
             sendDeviceConnectedEvent();
             break;
+            
         case sIOtype_EVENT:
-    
+            if (strncmp((char *)payload, "[\"pong\"]", 8) == 0) {
+                Serial.println("Pong received, connection is alive");
+            }
             handleSocketEvent(payload, length);
+            break;
+
+        case sIOtype_ACK:
+            Serial.printf("[IOc] get ack: %u\n", length);
+            break;
+        case sIOtype_ERROR:
+            Serial.printf("[IOc] get error: %u\n", length);
+            break;
+        case sIOtype_BINARY_EVENT:
+            Serial.printf("[IOc] get binary: %u\n", length);
+            break;
+        case sIOtype_BINARY_ACK:
+            Serial.printf("[IOc] get binary ack: %u\n", length);
             break;
         }
     }
@@ -93,11 +98,7 @@ public:
     }
     // Send log event
 
-    // Loop function for maintaining the connection
-    void loop()
-    {
-        socketIO.loop();
-    }
+
 
     // Check if the socket is connected
     bool isConnected()

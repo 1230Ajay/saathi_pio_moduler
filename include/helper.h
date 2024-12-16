@@ -23,9 +23,10 @@ public:
         return batteryPercentage;
     }
 
-
+    // DONE : restart device
     void restartDevice(int pin)
     {
+        Serial.println("device restarting");
         digitalWrite(pin, LOW);
         delay(1000 * 30);
         digitalWrite(pin, HIGH);

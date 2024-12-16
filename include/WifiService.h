@@ -12,15 +12,9 @@ public:
         WiFi.mode(WIFI_STA);
         
         // Connect to the Wi-Fi network
-        Serial.print("Connecting to WiFi...");
+        Serial.println("Connecting to WiFi...");
         WiFi.begin(SECRET_SSID, SECRET_PASS);
-
-        // Wait for connection
-        while (WiFi.status() != WL_CONNECTED) {
-            Serial.print(".");
-            delay(500);
-        }
-        Serial.println("\nConnected to WiFi!");
+        delay(1000*10);
     }
 
     bool isConnected() {
